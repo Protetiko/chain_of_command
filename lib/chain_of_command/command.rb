@@ -63,13 +63,7 @@ module ChainOfCommand
     end
 
     def skip!
-      puts "SKIP!"
       raise ChainOfCommand::Errors::Skip
-    end
-
-    def abort!
-      puts "ABORT!"
-      raise ChainOfCommand::Errors::Abort
     end
   end
 end
