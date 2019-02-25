@@ -46,4 +46,6 @@ chain = ChainOfCommand::Chain.new(AddTwoToCounter, AddFourToCounter)
 chain << AddEightToCounter
 chain << AddOneToCounter
 context = chain.call(counter: 0)
-puts "Counter: #{context.counter}"
+if context.success?
+  puts "Counter: #{context.counter}"
+end

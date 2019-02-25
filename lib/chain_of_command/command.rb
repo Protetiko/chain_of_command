@@ -34,6 +34,7 @@ module ChainOfCommand
       def call(context = {})
         if context.kind_of? Hash
           context = OpenStruct.new(context.to_h)
+          context['success?'] = true
         end
 
         commands = @commands&.clone || []
