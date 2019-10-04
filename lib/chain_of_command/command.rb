@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'ostruct'
+require 'lib/chain_of_command/context'
 
 module ChainOfCommand
   class Command
@@ -33,8 +33,8 @@ module ChainOfCommand
 
       def call(context = {})
         if context.kind_of? Hash
-          context = OpenStruct.new(context.to_h)
-          context['success?'] = true
+          context = Context.new(context.to_h)
+          #context['success?'] = true
         end
 
         commands = @commands&.clone || []
