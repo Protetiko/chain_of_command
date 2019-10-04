@@ -8,6 +8,7 @@ class CommandWithFields < ChainOfCommand::Command
   def call(context)
     puts "I'm #{self.class.name}"
     puts "Got context #{context}"
+    return context
   end
 end
 
