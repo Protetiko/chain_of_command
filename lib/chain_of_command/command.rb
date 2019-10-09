@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'lib/chain_of_command/context'
+require 'chain_of_command/context'
 
 module ChainOfCommand
   class Command
@@ -16,9 +16,15 @@ module ChainOfCommand
 
       def validate(context)
         missing_fields = []
-        (@fields || []).each do |field|
-          unless context.respond_to? field
-            missing_fields << field
+        (fields || []).each do |field|
+          if field[:default]
+            if !context.respond_to?(field[:field_name]) || context[field[:field_name]] == nil
+              context[field[:field_name]] = field[:default]
+            end
+          else
+            unless field[:optional] || context.respond_to?(field[:field_name])
+              missing_fields << field[:field_name]
+            end
           end
         end
 
@@ -27,8 +33,20 @@ module ChainOfCommand
         end
       end
 
-      def fields(*fields)
-        @fields = fields
+      # Usage:
+      # class Cls < ChainOfCommand::Command
+      #   field :name, optional: true
+      #   field :country, default: 'se'
+      # end
+
+      def field(field_name, options = {})
+        field = options.slice(:optional, :default)
+        field[:field_name] = field_name
+        fields << field
+      end
+
+      def fields
+        @fields ||= []
       end
 
       def call(context = {})
