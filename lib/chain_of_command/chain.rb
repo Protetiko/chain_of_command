@@ -4,21 +4,19 @@ require 'chain_of_command/command'
 
 module ChainOfCommand
   class Chain
-    attr_reader :command
-
     def initialize(*args)
       @command = Class.new(Command)
-      args.each do |command|
-        chain(command)
+      args.each do |cmd|
+        chain(cmd)
       end
     end
 
-    def << (command)
-      chain(command)
+    def << (cmd)
+      chain(cmd)
     end
 
-    def chain(command)
-      @command.chain(command)
+    def chain(cmd)
+      @command.chain(cmd)
     end
 
     def call(context = {})
