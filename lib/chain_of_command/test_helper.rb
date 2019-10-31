@@ -1,1 +1,2 @@
 require 'chain_of_command/test_helpers/command_chain_stub'
+require 'chain_of_command/test_helpers/command_field_assertion'

@@ -7,6 +7,7 @@ module ChainOfCommand
         refute_raises Errors::InvalidContext do
           super(context)
         end
+      end
     end
   end
 end

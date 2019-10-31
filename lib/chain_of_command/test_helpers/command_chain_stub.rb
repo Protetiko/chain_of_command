@@ -55,7 +55,7 @@ module ChainOfCommand
         def stub_command(cmd, context_data)
           @stub_map ||= {}
 
-          ap "stub #{cmd} with #{context_data}"
+          #ap "stub #{cmd} with #{context_data}"
 
           c = Class.new(cmd)
           c.define_method(:call) { |context|
