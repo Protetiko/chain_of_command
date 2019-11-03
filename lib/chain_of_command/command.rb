@@ -22,7 +22,7 @@ module ChainOfCommand
               context[field[:field_name]] = field[:default]
             end
           else
-            unless field[:optional] || context.respond_to?(field[:field_name])
+            if !field[:optional] && (!context.respond_to?(field[:field_name]) || context[field[:field_name]] == nil)
               missing_fields << field[:field_name]
             end
           end
@@ -50,10 +50,11 @@ module ChainOfCommand
       end
 
       def call(context = {})
-        if context.kind_of? Hash
+        if !context.kind_of?(ChainOfCommand::Context) && (context.kind_of?(Hash) || context.respond_to?(:to_h))
           context = Context.new(context.to_h)
-          #context['success?'] = true
         end
+
+        context['success?'] = true unless context.respond_to?(:success?)
 
         commands = @commands&.clone || []
 
