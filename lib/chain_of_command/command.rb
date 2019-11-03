@@ -50,7 +50,7 @@ module ChainOfCommand
       end
 
       def call(context = {})
-        if context.kind_of? Hash
+        if !context.kind_of?(ChainOfCommand::Context) && (context.kind_of?(Hash) || context.respond_to?(:to_h))
           context = Context.new(context.to_h)
           #context['success?'] = true
         end
