@@ -52,6 +52,12 @@ module ChainOfCommand
       end
 
       module ClassMethods
+        def stub_all
+          @commands.each do |command|
+            stub_command(command, {})
+          end
+        end
+
         def stub_command(cmd, context_data)
           @stub_map ||= {}
 
