@@ -53,7 +53,7 @@ module ChainOfCommand
 
       module ClassMethods
         def stub_all
-          @commands.each do |command|
+          @commands&.each do |command|
             stub_command(command, {})
           end
         end
