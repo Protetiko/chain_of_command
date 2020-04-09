@@ -28,10 +28,11 @@ class AddFourToCounter < ChainOfCommand::Command
 end
 
 class AddEightToCounter < ChainOfCommand::Command
-  fields :counter
   chain AddTwoToCounter
   chain AddTwoToCounter
   chain AddOneToCounter
+
+  fields :counter
 
   def call(context)
     puts "Adding the remainder (3)"
