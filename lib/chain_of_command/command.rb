@@ -16,14 +16,28 @@ module ChainOfCommand
 
       def validate(context)
         missing_fields = []
-        (fields || []).each do |field|
+        fields.each do |field|
+          field_name = field[:field_name]
+
           if field[:default]
-            if !context.respond_to?(field[:field_name]) || context[field[:field_name]] == nil
-              context[field[:field_name]] = field[:default]
+            if !context.respond_to?(field_name) || context[field_name] == nil
+              context[field_name] = field[:default]
             end
           else
-            if !field[:optional] && (!context.respond_to?(field[:field_name]) || context[field[:field_name]] == nil)
-              missing_fields << field[:field_name]
+            if !field[:optional] && (!context.respond_to?(field_name) || context[field_name] == nil)
+              missing_fields << field_name
+            end
+          end
+
+          if field[:validator]
+            result = field[:validator].new.call(context[field_name])
+            raise Errors::FieldValidationFailed if result.failure?
+            context[field_name] = result.to_h
+          end
+
+          if field[:type]
+            unless context[field_name].is_a?(field[:type])
+              raise Errors::InvalidFieldType.new("Expected the field #{field_name} to be of type #{field[:type]}, got a #{context[field_name].class.name}")
             end
           end
         end
@@ -36,11 +50,11 @@ module ChainOfCommand
       # Usage:
       # class Cls < ChainOfCommand::Command
       #   field :name, optional: true
-      #   field :country, default: 'se'
+      #   field :country, default: 'se', validator: Dry::Validation::Contract
       # end
 
       def field(field_name, options = {})
-        field = options.slice(:optional, :default)
+        field = options.slice(:optional, :default, :validator, :type)
         field[:field_name] = field_name
         fields << field
       end
