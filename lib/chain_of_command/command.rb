@@ -29,9 +29,9 @@ module ChainOfCommand
             end
           end
 
-          if field[:validator]
+          if field[:validator] && context[field_name]
             result = field[:validator].new.call(context[field_name])
-            raise Errors::FieldValidationFailed if result.failure?
+            raise Errors::FieldValidationFailed unless result.success?
             context[field_name] = result.to_h
           end
 
