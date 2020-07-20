@@ -17,6 +17,7 @@ module ChainOfCommand
 
     def chain(cmd)
       @command.chain(cmd)
+      self
     end
 
     def call(context = {})
