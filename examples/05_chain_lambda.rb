@@ -53,15 +53,16 @@ end
 
 
 
-chain = ChainOfCommand::Chain.new(AddTwoToCounter, AddFourToCounter)
-chain << AddEightToCounter
-chain << AddOneToCounter
-chain << ->(context){
+CounterChain = ChainOfCommand::Chain.new(AddTwoToCounter, AddFourToCounter).tap do |chain|
+  chain << AddFourToCounter
+end
+CounterChain << AddEightToCounter << AddOneToCounter
+CounterChain << ->(context){
   context.counter_stack ||= []
   context.counter_stack << context.counter
   context
 }
-context = chain.call(counter: 0)
+context = CounterChain.call(counter: 0)
 if context.success?
   puts "Counter: #{context.counter}"
   puts "Stack: #{context.counter_stack.inspect}"

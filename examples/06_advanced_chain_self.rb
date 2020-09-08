@@ -3,7 +3,7 @@
 require 'chain_of_command'
 
 class AddOneToCounter < ChainOfCommand::Command
-  fields :counter
+  field :counter
 
   def call(context)
     puts "Adding 1"
@@ -13,7 +13,7 @@ class AddOneToCounter < ChainOfCommand::Command
 end
 
 class AddTwoToCounter < ChainOfCommand::Command
-  fields :counter
+  field :counter
 
   def call(context)
     puts "Adding 2"
@@ -27,25 +27,20 @@ class AddFourToCounter < ChainOfCommand::Command
   chain AddTwoToCounter
 end
 
-class AddEightToCounter < ChainOfCommand::Command
+class AddSevenToCounter < ChainOfCommand::Command
+  chain AddFourToCounter
+  chain self
   chain AddTwoToCounter
-  chain self.class
-  chain AddOneToCounter
-
-  fields :counter
 
   def call(context)
-    puts "Adding the remainder (3)"
-    context.counter += 3
+    puts "Adding 1 through self"
+    context.counter += 1
     return context
   end
 end
 
-
-
 chain = ChainOfCommand::Chain.new(AddTwoToCounter, AddFourToCounter)
-chain << AddEightToCounter
-chain << AddOneToCounter
+chain << AddSevenToCounter
 context = chain.call(counter: 0)
 if context.success?
   puts "Counter: #{context.counter}"
