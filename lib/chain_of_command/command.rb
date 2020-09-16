@@ -4,6 +4,13 @@ require 'chain_of_command/context'
 
 module ChainOfCommand
   class Command
+    attr_accessor :context
+
+    def initialize(context)
+      @context = context
+    end
+    private_class_method :new
+
     class << self
       attr_reader :commands
 
@@ -31,7 +38,7 @@ module ChainOfCommand
 
           if field[:validator] && context[field_name]
             result = field[:validator].new.call(context[field_name])
-            raise Errors::FieldValidationFailed unless result.success?
+            raise Errors::FieldValidationFailed, { field_name => result.errors.to_h } unless result.success?
             context[field_name] = result.to_h
           end
 
@@ -73,12 +80,24 @@ module ChainOfCommand
         commands = @commands&.clone || []
 
         commands&.each do |command|
-          context = call_command(command, context)
+          begin
+            prev_context = context.clone
+            context = command.call(context) || prev_context
+          rescue ChainOfCommand::Errors::Skip
+            return context
+          end
         end
 
         if self.instance_methods.include? :call
           self.validate(context)
-          context = call_command(self.new, context)
+
+          begin
+            prev_context = context.clone
+            command = self.new(context)
+            context = command.call(context) || prev_context
+          rescue ChainOfCommand::Errors::Skip
+            return context
+          end
         end
 
         return context
@@ -86,14 +105,14 @@ module ChainOfCommand
 
       private
 
-      def call_command(command, context)
-        begin
-          prev_context = context.clone
-          return command.call(context) || prev_context
-        rescue ChainOfCommand::Errors::Skip
-          return context
-        end
-      end
+      # def call_command(command, context)
+      #   begin
+      #     prev_context = context.clone
+      #     return command.call(context) || prev_context
+      #   rescue ChainOfCommand::Errors::Skip
+      #     return context
+      #   end
+      # end
     end
 
     def skip!
