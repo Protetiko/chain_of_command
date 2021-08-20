@@ -14,8 +14,18 @@ module ChainOfCommand
     class << self
       attr_reader :commands
 
-      def chain(command)
+      def +(cmd)
+        klass = Class.new(Command)
+        klass.chain(self)
+        klass.chain(cmd)
+
+        return klass
+      end
+
+      def chain(command, **args)
         @commands ||= []
+        # @default_context[command] = args
+
         if command.respond_to? :call
           @commands << command
         end
@@ -52,7 +62,24 @@ module ChainOfCommand
         if missing_fields.size > 0
           raise Errors::InvalidContext.new("Expected the field(s) #{missing_fields.inspect}, to be present")
         end
+
+        # if @context_validator
+        #   result = @context_validator.new.call(context.clone)
+        #   raise Errors::ContextValidationFailed, result.errors.to_h unless result.success?
+        # end
       end
+
+
+      # Usage:
+      # class Cls < ChainOfCommand::Command
+      #   context_validator Dry::Validation::Contract
+      # end
+
+      # def context_validator(validator)
+      #   # raise unless validator.respond_to?(:call)
+      #   @context_validator = validator
+      # end
+
 
       # Usage:
       # class Cls < ChainOfCommand::Command

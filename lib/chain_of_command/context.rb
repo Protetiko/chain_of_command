@@ -3,5 +3,6 @@
 require 'ostruct'
 
 module ChainOfCommand
-  Context = Class.new(OpenStruct)
+  class Context < OpenStruct
+  end
 end

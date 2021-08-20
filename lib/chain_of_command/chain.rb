@@ -4,17 +4,25 @@ require 'chain_of_command/command'
 
 module ChainOfCommand
   class Chain
-    def initialize(*args)
+    def initialize(*commands)
       @command = Class.new(Command)
-      args.each do |cmd|
+      commands.each do |cmd|
         chain(cmd)
       end
     end
 
-    def << (cmd)
+    def <<(cmd)
       chain(cmd)
     end
 
+    def +(cmd)
+      self.class.new(*@command.commands, cmd)
+    end
+
+    def commands
+      return @command.commands
+    end
+    
     def chain(cmd)
       @command.chain(cmd)
       self
